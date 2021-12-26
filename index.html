@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <style>
+            body{
+                background: black;
+                margin: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: white;
+            }
+
+            #count{
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 75px;
+                text-align: center;
+            }
+            
+            .refreshBtn{
+                position: fixed;
+                bottom: 10px;
+                left: 50%;
+                transform: translate(-50%, 0);
+                background: rgb(32, 32, 32);
+                color: white;
+                border: white solid 2px;
+                border-radius: 8px;
+                padding: 10px 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="count">0<br /><span style="font-size: 20px;">People have downloaded noodle</span></div>
+
+        <button onclick="updateCount()" class="refreshBtn" id="refreshing">Refresh Count</button>
+
+        <script>
+            let amount = 0;
+            let div = document.getElementById('count');
+            let btn = document.getElementById('refreshing');
+
+            let countTo = (num) => {
+                if(amount < num){
+                    amount += 1;
+                    div.innerHTML = amount + '<br /><span style="font-size: 20px;">People have downloaded noodle</span>';
+
+                    setTimeout(() => {countTo(num)}, 1)
+                } else{
+                    btn.innerHTML = 'Refresh Count'
+                }
+            }
+
+            let updateCount = () => {
+                btn.innerHTML = 'Fetching Data'
+
+                fetch('https://api.github.com/repos/StackDoubleFlow/NoodleExtensions/releases').then(data => data.json()).then(data => {
+                    btn.innerHTML = 'Loading...'
+                    countTo(data[0].assets.find(x => x.name === "noodle_extensions.qmod").download_count)
+                })
+            }
+
+            updateCount();
+
+            setInterval(updateCount, 60000)
+        </script>
+    </body>
+</html>
